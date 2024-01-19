@@ -1,0 +1,43 @@
+@layout('layouts/main')
+
+@section('body')
+@include('partials/nav')
+
+
+
+<div class="container">
+
+  <form class="max-w-md w-full mx-auto space-y-4" method="POST" action="/projects/new">
+    <h1 class="text-3xl">
+      Proje ekle
+    </h1>
+    <label class="form-control w-full">
+      <div class="label">
+        <span class="label-text">Proje adı</span>
+
+      </div>
+      <input name="name" required type="text" placeholder="proje adı" class="input input-bordered w-full" />
+
+    </label>
+    <label class="form-control w-full">
+      <div class="label">
+        <span class="label-text">Başlangıç tarihi</span>
+      </div>
+      <input name="startDate" required type="date" class="input input-bordered w-full" />
+    </label>
+    <label class="form-control w-full">
+      <div class="label">
+        <span class="label-text">Bitiş tarihi</span>
+      </div>
+      <input name="endDate" required type="date" class="input input-bordered w-full" />
+    </label>
+
+
+
+    <button type="submit" class="btn btn-primary w-full">
+      Proje ekle
+    <button>
+  </form>
+</div>
+</div>
+@end

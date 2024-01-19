@@ -1,0 +1,233 @@
+@layout('layouts/main')
+
+@section('body')
+@include('partials/nav')
+<div class="container">
+
+  <div class="overflow-x-auto">
+    <h1 class="text-3xl mt-4">
+      {{data.name}}
+    </h1>
+    <div role="tablist" class="tabs tabs-lifted w-full bg-red-50">
+      <input type="radio" name="project-tab" role="tab" class="tab" aria-label="Detay" checked />
+      <div role="tabpanel" class="tab-content">
+        <table class="table w-auto">
+          <tbody>
+            <tr>
+              <td>
+                Başlangıç Tarihi
+              </td>
+
+              <td>
+                {{new Date(data.startDate).toLocaleDateString('tr-TR',{weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',})}}
+              </td>
+
+            </tr>
+            <tr>
+
+              <td>
+                Bitiş Tarihi
+              </td>
+
+              <td>
+                {{new Date(data.endDate).toLocaleDateString('tr-TR',{weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',})}}
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Toplam kullanıcı
+              </td>
+              <td>
+                {{users.length}}
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Toplam Görev
+              </td>
+              <td>
+                {{tasks.length}}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <input type="radio" name="project-tab" role="tab" class="tab" aria-label="Görevler"  />
+      <div role="tabpanel" class="tab-content">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>
+                Görev adı
+              </th>
+              <th>Adam Gün Değeri</th>
+              <th>Durum</th>
+              <th>Başlangıç Tarihi</th>
+              <th>Bitiş Tarihi</th>
+
+              <th class="w-0">
+                <button class="btn" onclick="add_task.showModal()">
+                  Görev Ekle
+                 </button>
+                 <dialog id="add_task" class="modal">
+                   <div class="modal-box">
+                     <form method="dialog">
+                       <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                     </form>
+                     <h3 class="font-bold text-lg">Görev ekle</h3>
+                     <form class="space-y-4" action="/tasks" method="POST">
+
+                        <input type="text" name="projectId" value={{data.id}} class="hidden">
+
+                        <label class="form-control w-full">
+                          <div class="label">
+                            <span class="label-text">Başlık</span>
+                          </div>
+                          <input name="title" required type="text" placeholder="Başlık" class="input input-bordered w-full" />
+                        </label>
+                        <label class="form-control w-full">
+                          <div class="label">
+                            <span class="label-text">Açıklama</span>
+                          </div>
+                          <textarea id="description" name="description" required type="text" placeholder="Açıklama" class="input input-bordered w-full h-20"></textarea>
+                        </label>
+                        <label class="form-control w-full">
+                          <div class="label">
+                            <span class="label-text">Adam gün değeri</span>
+                          </div>
+                          <input min="1" name="manDayValue" required type="number" placeholder="Adam gün değeri" class="input input-bordered w-full" />
+                        </label>
+                        <label class="form-control w-full">
+                          <div class="label">
+                            <span class="label-text">Başlangıç tarihi</span>
+                          </div>
+                          <input name="startDate" required type="date" class="input input-bordered w-full" />
+                        </label>
+                        <label class="form-control w-full">
+                          <div class="label">
+                            <span class="label-text">Bitiş tarihi</span>
+                          </div>
+                          <input name="endDate" required type="date" class="input input-bordered w-full" />
+                        </label>
+                        <div class="form-control max-h-24 overflow-auto">
+                          @each(user in users)
+                            <label class="label cursor-pointer">
+                              <span class="label-text">
+                                {{user.name}}
+                              </span>
+                              <input name="users[]" value="{{user.id}}" type="checkbox" class="checkbox" />
+                            </label>
+                          @end
+                        </div>
+                        <button class="btn btn-primary w-full">
+                          Ekle
+                        </button>
+                     </form>
+                   </div>
+                 </dialog>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @each(item in tasks)
+              <tr>
+                <td>
+                  {{item.title}}
+                </td>
+                <td>
+                  {{item.manDayValue}}
+                </td>
+                <td>
+                  @if(item.status === 0)
+                    <div class="badge badge-error text-white">Beklemede</div>
+                  @elseif(item.status === 1)
+                    <div class="badge badge-info text-white">Yapılıyor</div>
+                  @elseif(item.status === 2)
+                    <div class="badge badge-success text-white">Tamamlandı</div>
+                  @endif
+                </td>
+                <td>
+                  {{new Date(item.startDate).toLocaleDateString('tr-TR',{weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',})}}
+                </td>
+                <td>
+                  {{new Date(item.endDate).toLocaleDateString('tr-TR',{weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',})}}
+                </td>
+                <th>
+                  <a href="/tasks/{{item.id}}" class="btn btn-ghost btn-xs">Detay</a>
+                </th>
+              </tr>
+            @end
+          </tbody>
+        </table>
+      </div>
+
+      <input type="radio" name="project-tab" role="tab" class="tab" aria-label="Çalışanlar" />
+      <div role="tabpanel" class="tab-content">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>
+                Kullanıcı adı
+              </th>
+              <th>
+                E-posta
+              </th>
+              <th class="w-0">
+                <button class="btn" onclick="add_user.showModal()">
+                 Calisan Ekle
+                </button>
+                <dialog id="add_user" class="modal">
+                  <div class="modal-box">
+                    <form method="dialog">
+                      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                    </form>
+                    <h3 class="font-bold text-lg">Kullanıcı ekle</h3>
+                    <form class="space-y-4" action="/projects/{{data.id}}/user" method="POST">
+                      <label class="form-control w-full">
+                        <div class="label">
+                          <span class="label-text">E-posta</span>
+                        </div>
+                        <input name="email" required type="email" placeholder="Email" class="input input-bordered w-full" />
+                      </label>
+
+                      <button class="btn btn-primary w-full">
+                        Ekle
+                      </button>
+                    </form>
+                  </div>
+                </dialog>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @each(item in users)
+              <tr>
+                <td>
+                  {{item.name}}
+                </td>
+                <td>
+                  {{item.email}}
+                </td>
+              </tr>
+            @end
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+@end

@@ -1,0 +1,217 @@
+@layout('layouts/main')
+
+@section('body')
+@include('partials/nav')
+
+<div class="container">
+  <div class="bg-blue-100 p-4 my-4">
+
+    <div class="flex justify-between">
+
+      <h1 class="text-4xl">
+        {{data.title}}
+        <br>
+        @if(data.status === 0)
+          <div class="badge badge-error text-white">Beklemede</div>
+        @elseif(data.status === 1)
+          <div class="badge badge-info text-white">Yapılıyor</div>
+        @elseif(data.status === 2)
+          <div class="badge badge-success text-white">Tamamlandı</div>
+        @endif
+      </h1>
+      <button class="btn btn-primary text-white" onclick="update_tasks.showModal()">
+        Güncelle
+       </button>
+       <dialog id="update_tasks" class="modal">
+         <div class="modal-box">
+           <form method="dialog">
+             <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+           </form>
+           <h3 class="font-bold text-lg">Guncelle</h3>
+           <form id="update-form" class="space-y-4" action="/tasks/{{data.id}}/edit" method="POST">
+
+            <label class="form-control w-full">
+              <div class="label">
+                <span class="label-text">Başlık</span>
+              </div>
+              <input value={{data.title}} name="title" required type="text" placeholder="Başlık" class="input input-bordered w-full" />
+            </label>
+            <label class="form-control w-full">
+              <div class="label">
+                <span class="label-text">Açıklama</span>
+              </div>
+              <textarea name="description" required type="text" placeholder="Açıklama" class="input input-bordered w-full min-h-20" >{{data.description}}</textarea>
+            </label>
+            <label class="form-control w-full">
+              <div class="label">
+                <span class="label-text">Adam gün değeri</span>
+              </div>
+              <input value={{data.manDayValue}} min="1" name="manDayValue" required type="number" placeholder="Adam gün değeri" class="input input-bordered w-full" />
+            </label>
+            <label class="form-control w-full">
+              <div class="label">
+                <span class="label-text">Başlangıç tarihi</span>
+              </div>
+              <input value={{new Date(data.startDate).toLocaleDateString().split(" ")[0].split(".").reverse().join("-")}} name="startDate" required type="date" class="input input-bordered w-full" />
+            </label>
+            <label class="form-control w-full">
+              <div class="label">
+                <span class="label-text">Bitiş tarihi</span>
+              </div>
+              <input value={{new Date(data.endDate).toLocaleDateString().split(" ")[0].split(".").reverse().join("-")}} name="endDate" required type="date" class="input input-bordered w-full" />
+            </label>
+            <label class="form-control w-full">
+              <div class="label">
+              Durum
+              </div>
+              <select name="status" class="select select-bordered">
+                <option
+                  @if(data.status === 0)
+                  selected
+                  @endif
+                  value="0"
+                >Beklemede</option>
+                <option
+                  @if(data.status === 1)
+                  selected
+                  @endif
+                  value="1"
+                >Yapılıyor</option>
+                <option
+                  @if(data.status === 2)
+                  selected
+                  @endif
+                  value="2"
+                >Tamamlandı</option>
+              </select>
+
+            </label>
+             <div class="form-control max-h-24 overflow-auto">
+              @each(user in users)
+                 <label class="label cursor-pointer">
+                   <span class="label-text">
+                     {{user.name}}
+                   </span>
+                   <input name="users[]" value="{{user.id}}" type="checkbox" class="checkbox" checked />
+                 </label>
+               @end
+               @each(user in allUsers)
+                 <label class="label cursor-pointer">
+                   <span class="label-text">
+                     {{user.name}}
+                   </span>
+                   <input name="users[]" value="{{user.id}}" type="checkbox" class="checkbox" />
+                 </label>
+               @end
+             </div>
+             <button class="btn btn-primary w-full">
+               Güncelle
+             </button>
+           </form>
+         </div>
+       </dialog>
+    </div>
+    <br>
+    <p>
+     {{data.description}}
+    </p>
+  </div>
+  <table class="table w-auto">
+    <tbody>
+      <tr>
+        <td>
+          Başlangıç Tarihi
+        </td>
+
+        <td>
+          {{new Date(data.startDate).toLocaleDateString('tr-TR',{weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',})}}
+        </td>
+
+      </tr>
+      <tr>
+
+        <td>
+          Bitiş Tarihi
+        </td>
+
+        <td>
+          {{new Date(data.endDate).toLocaleDateString('tr-TR',{weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',})}}
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Görevli sayısı
+        </td>
+        <td>
+          {{users.length}}
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Bulunduğu Proje
+        </td>
+        <td>
+          <a href="/projects/{{project.id}}">
+            {{project.name}}
+          </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>
+          Kullanıcı adı
+        </th>
+        <th>
+          E-posta
+        </th>
+        <th class="w-0">
+
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      @each(item in users)
+        <tr>
+          <td>
+            {{item.name}}
+          </td>
+          <td>
+            {{item.email}}
+          </td>
+        </tr>
+      @end
+    </tbody>
+  </table>
+</div>
+
+<script>
+  const form = document.getElementById("update-form")
+  const onSubmit = (event) => {
+    event.preventDefault()
+    const formData = new FormData(event.target)
+    const action = event.target.action
+
+    fetch(action,{
+      method:"POST",
+      body:formData
+    }).then((x)=>{
+
+    window.location.reload()
+    }).catch(x=>{
+      alert("bir hata oluştu")
+    })
+  }
+  form.addEventListener("submit",onSubmit)
+
+</script>
+
+@end

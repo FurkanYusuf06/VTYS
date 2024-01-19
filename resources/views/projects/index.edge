@@ -1,0 +1,62 @@
+@layout('layouts/main')
+
+@section('body')
+@include('partials/nav')
+
+<div class="container">
+
+  <div class="overflow-x-auto">
+  <table class="table">
+    <!-- head -->
+    <thead>
+      <tr>
+        <th>
+          Proje Adı
+        </th>
+        <th>Başlangıç Tarihi</th>
+        <th>Bitiş Tarihi</th>
+        <th class="w-0">
+          <a href="/projects/new" class="btn btn-primary">
+            Yeni Proje Ekle
+          </a>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      @each(item in data)
+      <tr>
+        <td>
+          {{item.name}}
+          <br/>
+          <span class="badge badge-primary badge-sm text-white">
+            {{item.taskCount}} Görev
+          </span>
+          <span class="badge badge-secondary badge-sm text-white">
+            {{item.userCount}} Kullanıcı
+          </span>
+        </td>
+        <td>
+          {{new Date(item.startDate).toLocaleDateString('tr-TR',{weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',})}}
+        </td>
+        <td>
+          {{new Date(item.endDate).toLocaleDateString('tr-TR',{weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',})}}
+        </td>
+        <th>
+          <a href="/projects/{{item.id}}" class="btn btn-ghost btn-xs">Detay</a>
+        </th>
+      </tr>
+      @end
+      <!-- row 1 -->
+
+
+    </tbody>
+  </table>
+</div>
+</div>
+@end

@@ -1,0 +1,43 @@
+@layout('layouts/main')
+
+
+@section('body')
+<div class="h-screen flex justify-center items-center">
+  <form class="max-w-md w-full space-y-4" method="POST" action="/auth/login">
+    <h1 class="text-3xl">
+      Giriş yap
+    </h1>
+
+    <label class="form-control w-full">
+      <div class="label">
+        <span class="label-text">E-posta</span>
+
+      </div>
+      <input name="email" required type="email" placeholder="Email" class="input input-bordered w-full" />
+    </label>
+    <label class="form-control w-full">
+      <div class="label">
+        <span class="label-text">Parola</span>
+
+      </div>
+      <input required name="password" type="password" placeholder="Parola" class="input input-bordered w-full" />
+      @if(flashMessages.get("errors")?.password)
+      <span class="label-text-alt text-red-400 mt-2">
+        parola minumun 8 karakter olmalı
+      </span>
+      @endif
+    </label>
+
+
+    <button type="submit" class="btn btn-primary w-full">
+      Giriş yap
+    <button>
+
+      <p class="text-sm">
+        Hesabın yok mu? <a class="link link-hover link-primary" href="/auth/register">
+          Kayıt ol
+        </a>
+      </p>
+  </form>
+</div>
+@end
